@@ -1,0 +1,22 @@
+label {
+  display: inline-block;
+  padding-bottom: .5rem;
+  color: var(--clr-deep-violet);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+input {
+  height: 45px;
+  border-radius: 0.5rem;
+  border: var(--clr-light-gray) 1px solid;
+  font-size: 18px;
+  padding: 0 1rem;
+  width: 100%;
+
+  &::placeholder {
+    color: var(--clr-deep-violet);
+    opacity: 25%;
+  }
+}
