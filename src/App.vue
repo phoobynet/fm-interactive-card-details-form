@@ -8,6 +8,7 @@ import CardCvc from '@/components/CardCvc.vue'
 import CardExpiry from '@/components/CardExpiry.vue'
 import { useCardFormData } from '@/use/useCardFormData'
 import ConfirmButton from '@/components/ConfirmButton.vue'
+import GradientInput from '@/components/GradientInput.vue'
 
 const { form } = useCardFormData()
 
@@ -26,6 +27,7 @@ const confirmHandler = () => {}
         @submit.prevent="submitHandler"
         class="card-form"
       >
+        <GradientInput />
         <CardholderName />
         <CardNumber />
         <div class="expiry-cvc">
