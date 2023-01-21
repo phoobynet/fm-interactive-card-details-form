@@ -4,29 +4,38 @@
 >
 import { MaskInputOptions } from 'maska'
 import { padStart, trimStart } from 'lodash'
-import { useCardFormStore } from '@/stores/useCardFormStore'
-import { storeToRefs } from 'pinia'
+import { ref, watch } from 'vue'
 
-const store = useCardFormStore()
+defineProps<{ modelValue: string }>()
+const expiryMonth = ref<string>('')
+const error = ref<string>('')
+const emit = defineEmits(['update:modelValue'])
 
-const { expiryMonth, expiryMonthError, expiryMonthDirty } = storeToRefs(store)
+const unformat = (val: string) => trimStart((val || '').trim(), '0')
+const format = (val: string | number) => {
+  const s = val.toString()
+  return s.length < 2 ? padStart(val.toString(), 2, '0') : s
+}
+
+const isValid = (val: string | number) => {
+  let n: number
+  if (typeof val === 'string') {
+    n = parseInt(unformat(val))
+  } else {
+    n = val
+  }
+
+  return n > 0 && n <= 12
+}
 
 const options: MaskInputOptions = {
-  preProcess: val => {
-    return trimStart((val || '').trim(), '0')
-  },
+  preProcess: unformat,
   eager: true,
   postProcess: val => {
-    val = trimStart((val || '').trim(), '0')
+    val = unformat(val)
 
-    const numberVal = parseInt(val)
-
-    if (isNaN(numberVal)) {
+    if (!isValid(val)) {
       return ''
-    }
-
-    if (numberVal < 10) {
-      val = padStart(val, 2, '0')
     }
 
     return val
@@ -40,11 +49,17 @@ const blurHandler = (e: InputEvent) => {
   const v = parseInt(input.value)
 
   if (v < 12 && v > 0) {
-    store.$patch({
-      expiryMonth: padStart(v.toString(), 2, '0'),
-    })
+    expiryMonth.value = format(v)
   }
 }
+
+watch(expiryMonth, (newValue, oldValue) => {
+  error.value = ''
+
+  if (isValid(newValue)) {
+    emit('update:modelValue', newValue)
+  }
+})
 
 </script>
 

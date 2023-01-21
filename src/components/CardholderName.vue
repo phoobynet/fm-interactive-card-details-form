@@ -17,6 +17,7 @@ const error = ref<string>()
 const isDirty = ref<boolean>(false)
 
 watch(value, (newValue) => {
+  error.value = ''
   if (newValue?.length) {
     emit('update:modelValue', newValue)
   } else if (isDirty.value && !newValue?.length) {
