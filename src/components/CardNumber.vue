@@ -4,17 +4,16 @@
 >
 import { reactive, ref, watch } from 'vue'
 import { MaskaDetail } from 'maska'
-import { useCardFormStore } from '@/stores/useCardFormStore'
-import { storeToRefs } from 'pinia'
 import InputError from '@/components/InputError.vue'
 
-const store = useCardFormStore()
+const props = defineProps<{
+  modelValue: string
+}>()
+const emit = defineEmits(['update:modelValue'])
 
-const {
-  cardNumber,
-  cardNumberError,
-} = storeToRefs(store)
-const value = ref<string>(cardNumber.value)
+const value = ref<string>(props.modelValue)
+const error = ref<string>()
+const isDirty = ref<boolean>(false)
 
 const bindingObject = reactive<MaskaDetail>({
   completed: false,
@@ -23,9 +22,16 @@ const bindingObject = reactive<MaskaDetail>({
 })
 
 watch(() => bindingObject.unmasked, (newValue) => {
-  store.$patch({
-    cardNumber: newValue,
-  })
+  if (newValue?.length !== 16) {
+    error.value = 'Invalid card number'
+    emit('update:modelValue', '')
+  } else if (isDirty.value && !newValue?.length) {
+    emit('update:modelValue', '')
+    error.value = `Can't be blank`
+  } else {
+    emit('update:modelValue', newValue)
+    error.value = ''
+  }
 })
 </script>
 
@@ -40,9 +46,10 @@ watch(() => bindingObject.unmasked, (newValue) => {
       v-maska="bindingObject"
       data-maska="#### #### #### ####"
       autocomplete="off"
-      :data-invalid="!!cardNumberError"
+      :data-invalid="!!error"
+      @keyup="() => isDirty = true"
     >
-    <InputError :error="cardNumberError" />
+    <InputError :error="error" />
   </div>
 </template>
 

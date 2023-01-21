@@ -2,15 +2,28 @@
   lang="ts"
   setup
 >
-import { useCardFormStore } from '@/stores/useCardFormStore'
-import { storeToRefs } from 'pinia'
 import InputError from '@/components/InputError.vue'
+import { ref, watch } from 'vue'
 
 const MAX_LENGTH = 100
 
-const store = useCardFormStore()
+const props = defineProps<{
+  modelValue: string
+}>()
+const emit = defineEmits(['update:modelValue'])
 
-const { cardholderName, cardholderNameError } = storeToRefs(store)
+const value = ref<string | undefined>(props.modelValue)
+const error = ref<string>()
+const isDirty = ref<boolean>(false)
+
+watch(value, (newValue) => {
+  if (newValue?.length) {
+    emit('update:modelValue', newValue)
+  } else if (isDirty.value && !newValue?.length) {
+    emit('update:modelValue', '')
+    error.value = `Can't be blank`
+  }
+})
 
 </script>
 
@@ -21,13 +34,14 @@ const { cardholderName, cardholderNameError } = storeToRefs(store)
     <input
       id="cardholderName"
       type="text"
-      v-model="cardholderName"
+      v-model="value"
       autocomplete="off"
       placeholder="e.g. Jane Appleseed"
       :maxlength="MAX_LENGTH"
-      :data-invalid="!!cardholderNameError"
+      :data-invalid="!!error"
+      @keyup="() => isDirty = true"
     >
-    <InputError :error="cardholderNameError" />
+    <InputError :error="error" />
   </div>
 </template>
 

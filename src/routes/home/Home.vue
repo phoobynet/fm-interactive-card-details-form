@@ -2,48 +2,12 @@
   setup
   lang="ts"
 >
+import { ref } from 'vue'
 import CardholderName from '@/components/CardholderName.vue'
 import CardNumber from '@/components/CardNumber.vue'
-import CardCvc from '@/components/CardCvc.vue'
-import CardExpiry from '@/components/CardExpiry.vue'
-import ConfirmButton from '@/components/ConfirmButton.vue'
-import { useCardFormStore } from '@/stores/useCardFormStore'
-import { debouncedWatch } from '@vueuse/core'
-import { storeToRefs } from 'pinia'
 
-const store = useCardFormStore()
-
-const {
-  cardholderName,
-  cardNumber,
-  expiryMonth,
-  expiryYear,
-  cvc,
-} = storeToRefs(store)
-
-debouncedWatch(
-  [cardholderName, cardNumber, expiryMonth, expiryYear, cvc],
-  async (
-    [newCardholderName, newCardNumber, newExpiryMonth, newExpiryYear, newCvc],
-    [oldCardholderName, oldCardNumber, oldExpiryMonth, oldExpiryYear, oldCvc],
-  ) => {
-    await store.validate({
-      cardholderName: newCardholderName,
-      cardNumber: newCardNumber,
-      expiryMonth: newExpiryMonth,
-      expiryYear: newExpiryYear,
-      cvc: newCvc,
-    }, {
-      cardholderName: oldCardholderName,
-      cardNumber: oldCardNumber,
-      expiryMonth: oldExpiryMonth,
-      expiryYear: oldExpiryYear,
-      cvc: oldCvc,
-    })
-  }, {
-    debounce: 500,
-  },
-)
+const cardholderName = ref<string>('')
+const cardNumber = ref<string>('')
 
 const submitHandler = () => {
   console.log('Form submitted')
@@ -56,20 +20,21 @@ const confirmHandler = () => {}
 <template>
   <div class="container">
     <main>
-      <p>cardholderNameError: {{ store.cardholderNameError }}</p>
       <form
         @submit.prevent="submitHandler"
         class="card-form"
       >
-        <CardholderName />
-        <CardNumber />
-        <div class="expiry-cvc">
-          <CardExpiry />
-          <CardCvc />
-        </div>
-        <div class="confirm-container">
-          <ConfirmButton @click="confirmHandler">Confirm</ConfirmButton>
-        </div>
+        <p>{{ cardholderName }}</p>
+        <p>{{ cardNumber }}</p>
+        <CardholderName v-model="cardholderName" />
+        <CardNumber v-model="cardNumber" />
+        <!--        <div class="expiry-cvc">-->
+        <!--          <CardExpiry />-->
+        <!--          <CardCvc />-->
+        <!--        </div>-->
+        <!--        <div class="confirm-container">-->
+        <!--          <ConfirmButton @click="confirmHandler">Confirm</ConfirmButton>-->
+        <!--        </div>-->
       </form>
     </main>
   </div>
