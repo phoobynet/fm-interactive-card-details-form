@@ -2,23 +2,12 @@
   lang="ts"
   setup
 >
-import { useCardFormData } from '@/use/useCardFormData'
-import InputError from '@/components/InputError.vue'
-import { computed } from 'vue'
+import { useCardFormStore } from '@/stores/useCardFormStore'
+import { storeToRefs } from 'pinia'
 
-const {
-  form,
-  errors,
-} = useCardFormData()
+const store = useCardFormStore()
 
-const value = computed({
-  get () {
-    return form.cvc.value
-  },
-  set (value) {
-    form.cvc.value = value
-  },
-})
+const { cvc } = storeToRefs(store)
 </script>
 
 <template>
@@ -27,10 +16,12 @@ const value = computed({
     <input
       id="cvc"
       type="text"
-      v-model="value"
+      v-model="cvc"
       placeholder="e.g. 123"
+      v-maska
+      data-maska="###"
+      autocomplete="off"
     >
-    <InputError :error="errors.cvc.value" />
   </div>
 </template>
 

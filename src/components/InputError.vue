@@ -6,10 +6,11 @@ defineProps<{ error?: string }>()
 </script>
 
 <template>
-  <span
+  <div
     class="input-error"
     v-if="!!error"
-  >{error}</span>
+  >{{ error }}
+  </div>
 </template>
 
 <style
@@ -18,6 +19,8 @@ defineProps<{ error?: string }>()
 >
   .input-error {
     color: var(--clr-error);
+    font-size: 12px;
+    padding-top: .5rem;
   }
 </style>
 

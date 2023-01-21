@@ -9,9 +9,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.2.45"
+    "@vueuse/core": "^9.11.1",
+    "card-validator": "^8.1.1",
+    "date-fns": "^2.29.3",
+    "lodash": "^4.17.21",
+    "maska": "^2.1.4",
+    "pinia": "^2.0.29",
+    "vue": "^3.2.45",
+    "vue-router": "^4.1.6"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.191",
     "@types/node": "^18.11.18",
     "@vitejs/plugin-vue": "^4.0.0",
     "sass": "^1.57.1",

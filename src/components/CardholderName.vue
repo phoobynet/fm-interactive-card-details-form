@@ -2,23 +2,15 @@
   lang="ts"
   setup
 >
-import { useCardFormData } from '@/use/useCardFormData'
+import { useCardFormStore } from '@/stores/useCardFormStore'
+import { storeToRefs } from 'pinia'
 import InputError from '@/components/InputError.vue'
-import { computed } from 'vue'
 
-const {
-  form,
-  errors,
-} = useCardFormData()
+const MAX_LENGTH = 100
 
-const value = computed({
-  get () {
-    return form.cardholderName.value
-  },
-  set (value) {
-    form.cardholderName.value = value
-  },
-})
+const store = useCardFormStore()
+
+const { cardholderName, cardholderNameError } = storeToRefs(store)
 
 </script>
 
@@ -29,10 +21,13 @@ const value = computed({
     <input
       id="cardholderName"
       type="text"
-      v-model="value"
+      v-model="cardholderName"
+      autocomplete="off"
       placeholder="e.g. Jane Appleseed"
+      :maxlength="MAX_LENGTH"
+      :data-invalid="!!cardholderNameError"
     >
-    <InputError :error="errors.cardholderName.value" />
+    <InputError :error="cardholderNameError" />
   </div>
 </template>
 
