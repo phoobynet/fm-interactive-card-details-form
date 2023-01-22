@@ -7,20 +7,32 @@ import { padStart, trimStart } from 'lodash'
 import { ref, watch } from 'vue'
 
 defineProps<{ modelValue: string }>()
-const expiryMonth = ref<string>('')
-const error = ref<string>('')
 const emit = defineEmits(['update:modelValue'])
 
-const unformat = (val: string) => trimStart((val || '').trim(), '0')
-const format = (val: string | number) => {
+const expiryMonth = ref<string>('')
+const error = ref<string>('')
+
+const stripLeadingZero = (val: string | undefined) => trimStart((val || '').trim(), '0')
+
+const addLeadingZero = (val: string | number | undefined) => {
+  if (val === undefined) {
+    return ''
+  }
+
   const s = val.toString()
-  return s.length < 2 ? padStart(val.toString(), 2, '0') : s
+  return s.length < 2
+    ? padStart(val.toString(), 2, '0')
+    : s
 }
 
-const isValid = (val: string | number) => {
+const isValidMonth = (val: string | number | undefined) => {
+  if (val === undefined) {
+    return false
+  }
+
   let n: number
   if (typeof val === 'string') {
-    n = parseInt(unformat(val))
+    n = parseInt(stripLeadingZero(val))
   } else {
     n = val
   }
@@ -28,13 +40,21 @@ const isValid = (val: string | number) => {
   return n > 0 && n <= 12
 }
 
+const toInt = (val: string): number | undefined => {
+  const n = parseInt(val)
+
+  return isNaN(n)
+    ? undefined
+    : n
+}
+
 const options: MaskInputOptions = {
-  preProcess: unformat,
+  preProcess: stripLeadingZero,
   eager: true,
   postProcess: val => {
-    val = unformat(val)
+    val = stripLeadingZero(val)
 
-    if (!isValid(val)) {
+    if (!isValidMonth(val)) {
       return ''
     }
 
@@ -45,19 +65,26 @@ const options: MaskInputOptions = {
 // insert leading zero values when missing
 const blurHandler = (e: InputEvent) => {
   const input = e.currentTarget as HTMLInputElement
+  const v = toInt(input.value)
 
-  const v = parseInt(input.value)
-
-  if (v < 12 && v > 0) {
-    expiryMonth.value = format(v)
+  if (isValidMonth(v)) {
+    expiryMonth.value = addLeadingZero(v)
   }
 }
 
 watch(expiryMonth, (newValue, oldValue) => {
   error.value = ''
 
-  if (isValid(newValue)) {
+  if (isValidMonth(newValue) && newValue !== oldValue) {
     emit('update:modelValue', newValue)
+  } else {
+    emit('update:modelValue', '')
+
+    if (newValue === '') {
+      error.value = `Cant' be blank`
+    } else {
+      error.value = 'Invalid month'
+    }
   }
 })
 

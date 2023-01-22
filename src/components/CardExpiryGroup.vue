@@ -2,27 +2,18 @@
   lang="ts"
   setup
 >
-import CardExpiryMonthInput from '@/components/CardExpiryMonthInput.vue'
-import CardExpiryYearInput from '@/components/CardExpiryYearInput.vue'
-import { useCardFormStore } from '@/stores/useCardFormStore'
 import InputError from '@/components/InputError.vue'
 
-const store = useCardFormStore()
-
-const { expiryError } = store
+defineProps<{ expiryError?: string }>()
 </script>
 
 <template>
   <div class="card-expiry">
     <label for="expiryMonth">exp. date (MM/YY)</label>
     <div class="inputs">
-      <CardExpiryMonthInput />
-      <CardExpiryYearInput />
+      <slot>
+      </slot>
     </div>
-    <span>
-
-    {{ expiryError}}
-    </span>
     <InputError :error="expiryError" />
   </div>
 </template>

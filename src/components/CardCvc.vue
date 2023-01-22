@@ -2,12 +2,26 @@
   lang="ts"
   setup
 >
-import { useCardFormStore } from '@/stores/useCardFormStore'
-import { storeToRefs } from 'pinia'
+import { ref, watch } from 'vue'
 
-const store = useCardFormStore()
+const MIN_LENGTH = 3
+const MAX_LENGTH = 4
 
-const { cvc } = storeToRefs(store)
+defineProps<{ modelValue: string }>()
+const emit = defineEmits(['update:modelValue'])
+
+const isDirty = ref<boolean>(false)
+const value = ref<string>('')
+const error = ref<string>('')
+const validate = /^[0-9]{3, 4}$/
+
+watch(value, (newValue, oldValue) => {
+  if (newValue !== oldValue && validate.test(newValue)) {
+    emit('update:modelValue', newValue)
+  }
+})
+
+
 </script>
 
 <template>
@@ -16,11 +30,14 @@ const { cvc } = storeToRefs(store)
     <input
       id="cvc"
       type="text"
-      v-model="cvc"
+      v-model="value"
       placeholder="e.g. 123"
       v-maska
       data-maska="###"
       autocomplete="off"
+      :minlength="MIN_LENGTH"
+      :maxlength="MAX_LENGTH"
+      @keyup="()=> isDirty = true"
     >
   </div>
 </template>
